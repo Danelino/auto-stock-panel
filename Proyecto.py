@@ -2,8 +2,7 @@ import streamlit as st
 import pandas as pd  
 import matplotlib.pyplot as plt  
 import seaborn as sns  
-import os
-st.write("Archivos disponibles en el entorno:", os.listdir())
+
 
 
 # Cargar datos
@@ -15,7 +14,7 @@ inventario = pd.read_csv("inventario.csv", sep=";",
                          names = ["Codigo_Local", "Codigo_Repuesto", "Cantidad_Stock"] )
 
 # Cargar catálogo de marcas 
-catalogo = pd.read_csv("familia.csv", sep=";", names =["Letra", "Marca"])
+catalogo = pd.read_csv("Familia.csv", sep=";", names =["Letra", "Marca"])
 
 
 # colocar item -1 a 0
