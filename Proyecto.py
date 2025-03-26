@@ -2,6 +2,9 @@ import streamlit as st
 import pandas as pd  
 import matplotlib.pyplot as plt  
 import seaborn as sns  
+import os
+st.write("Archivos disponibles en el entorno:", os.listdir())
+
 
 # Cargar datos
 df = pd.read_csv("datos2020-2025.csv", sep=";", parse_dates=["Fecha_Venta"],
