@@ -2,7 +2,10 @@ import streamlit as st
 import pandas as pd  
 import matplotlib.pyplot as plt  
 import seaborn as sns  
-
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+from datetime import datetime, timedelta
 
 
 # Cargar datos
@@ -166,6 +169,70 @@ plt.xlabel("Marca")
 plt.ylabel("Cantidad Vendida")
 st.pyplot(fig)
 
+# -----------------------------------------------------------
+# 📦 MODELO DE PREDICCION DE DEMANDA MENSUAL POR LOCAL 
+# -----------------------------------------------------------
+
+st.subheader("📈 Predicción de Demanda para el Próximo Mes")
+
+# 🗂️ Cargar ventas filtradas (asegúrate que df_filtrado ya existe)
+df_filtrado_modelo = df_filtrado.copy()
+
+# 🧹 Preprocesamiento
+df_filtrado_modelo["Mes"] = df_filtrado_modelo["Fecha_Venta"].dt.to_period("M")
+
+# Agrupar por Código_Local, Código_Repuesto y Mes
+ventas_mensuales = df_filtrado_modelo.groupby([
+    "Codigo_Local", "Codigo_Repuesto", "Mes"])["Cantidad"].sum().reset_index()
+
+# 🔢 Codificar repuestos como números
+ventas_mensuales["Codigo_Repuesto"] = ventas_mensuales["Codigo_Repuesto"].astype("category")
+ventas_mensuales["Repuesto_ID"] = ventas_mensuales["Codigo_Repuesto"].cat.codes
+
+# Convertir Mes a entero (YYYYMM)
+ventas_mensuales["Mes_Num"] = ventas_mensuales["Mes"].astype(str).str.replace("-", "").astype(int)
+
+# Filtrar por local seleccionado
+ventas_local = ventas_mensuales[ventas_mensuales["Codigo_Local"] == local_seleccionado].copy()
+
+# Variables predictoras y objetivo
+X = ventas_local[["Repuesto_ID", "Mes_Num"]]
+y = ventas_local["Cantidad"]
+
+# Entrenar modelo
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+modelo = RandomForestRegressor(n_estimators=100, random_state=42)
+modelo.fit(X_train, y_train)
+
+# Evaluar modelo (opcional)
+y_pred = modelo.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+st.write(f"🔍 Error cuadrático medio del modelo: {mse:.2f}")
+
+# 📅 Predecir próximo mes
+ultimo_mes = ventas_local["Mes_Num"].max()
+proximo_mes = (datetime.strptime(str(ultimo_mes), "%Y%m") + timedelta(days=32)).strftime("%Y%m")
+proximo_mes = int(proximo_mes[:4] + proximo_mes[5:])
+
+# Crear DataFrame con todos los repuestos para el próximo mes
+repuestos_ids = ventas_local["Repuesto_ID"].unique()
+X_pred = pd.DataFrame({
+    "Repuesto_ID": repuestos_ids,
+    "Mes_Num": proximo_mes
+})
+
+# Realizar predicción
+predicciones = modelo.predict(X_pred)
+
+# Mapear Repuesto_ID a Código_Repuesto
+codigo_map = dict(zip(ventas_local["Repuesto_ID"], ventas_local["Codigo_Repuesto"]))
+X_pred["Codigo_Repuesto"] = X_pred["Repuesto_ID"].map(codigo_map)
+X_pred["Prediccion_Unidades"] = predicciones.astype(int)
+X_pred["Mes"] = pd.to_datetime(str(proximo_mes), format="%Y%m").to_period("M")
+
+# Mostrar resultados
+st.write("🔮 Predicción de unidades a vender en el próximo mes:")
+st.dataframe(X_pred[["Codigo_Repuesto", "Mes", "Prediccion_Unidades"]].sort_values("Prediccion_Unidades", ascending=False))
 
 # Ejecutar Streamlit con:
 # streamlit run nombre_del_archivo.py
