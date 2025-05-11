@@ -173,7 +173,6 @@ if login():
 
     st.subheader("📦 Recomendaciones de Stock ")
 
-
     # Selector de cantidad de filas a mostrar
     cantidad_a_mostrar = st.selectbox(
         "¿Cuántos productos quieres visualizar por sección?",
