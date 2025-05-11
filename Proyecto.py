@@ -175,11 +175,11 @@ if login():
 
     # Selector de cantidad de filas a mostrar
     cantidad_a_mostrar = st.selectbox(
-        "¿Cuántos productos quieres visualizar por sección?",
-        options=[10, 20, 50, 100, len(df_inventario)],
-        index=0,
-        format_func=lambda x: "Todos" if x == len(df_inventario) else x
-    )
+    "¿Cuántos productos quieres visualizar por sección?",
+    options=[10, 20, 50, 100, len(df_inventario)],
+    index=0
+)
+
 
     # Mostrar Productos con buena rotación
     st.write("✅ Productos con buena rotación (conviene mantener):")
