@@ -1,10 +1,13 @@
-Versión 1.0 – Plataforma de Gestión y Análisis de Ventas e Inventario
-Fecha de lanzamiento: 21 de mayo de 2025
-Versión: 1.0
+Versión Actual: v1.0 - Autenticación Integrada
+Novedades en la Versión 1.0
 
 Nuevas funcionalidades:
 Sistema de autenticación de usuarios.
 * Implementado inicio de sesión con validación contra archivo CSV.
+
+
+Versión actual 2.0 – Plataforma de Gestión y Análisis de Ventas e Inventario
+Novedades Versión: 2.0
 
 Mejoras en la visualización:
 Nuevas gráficas interactivas para comparar locales y repuestos.
